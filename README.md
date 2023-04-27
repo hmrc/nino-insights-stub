@@ -1,7 +1,7 @@
 
 # nino-insights-stub
 
-This is a placeholder README.md for a new repository
+This is a nino reject list stub for nino-insights
 
 ### License
 
