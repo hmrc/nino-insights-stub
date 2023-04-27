@@ -56,5 +56,16 @@ class NinoRiskListsControllerSpec extends AnyWordSpec with Matchers {
       status(result) shouldBe Status.OK
       contentAsString(result) shouldBe responseFalse
     }
+    "return 400 " in {
+      val rejectNinoDetails: NinoDetails = NinoDetails("AB123456A")
+      val fakeRequestWithFalse = FakeRequest("POST", "/reject/nino")
+        .withBody(Json.toJson(""))
+        .withHeaders(CONTENT_TYPE -> "application/json")
+      val responseFalse = """{"result": false}"""
+
+      val result = controller.isNinoOnRejectList()(fakeRequestWithFalse)
+      status(result) shouldBe Status.BAD_REQUEST
+    }
+
   }
 }
