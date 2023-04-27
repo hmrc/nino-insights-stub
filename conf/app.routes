@@ -1,0 +1,3 @@
+# microservice specific routes
+
+POST       /reject/nino             uk.gov.hmrc.ninoinsightsstub.controllers.NinoRiskListsController.isNinoOnRejectList()
