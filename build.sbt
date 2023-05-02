@@ -1,6 +1,6 @@
 import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
 
-lazy val microservice = Project("nino-insights-stubs", file("."))
+lazy val microservice = Project("nino-insights-stub", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .settings(
     majorVersion        := 0,
