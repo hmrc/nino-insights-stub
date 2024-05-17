@@ -1,24 +1,26 @@
-import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
+import uk.gov.hmrc.DefaultBuildSettings
 
-lazy val microservice = Project("nino-insights-stub", file("."))
-  .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
+ThisBuild / majorVersion := 0
+ThisBuild / scalaVersion := "2.13.12"
+
+val appName = "nino-insights-stub"
+
+lazy val microservice = Project(appName, file("."))
+  .enablePlugins(
+    play.sbt.PlayScala,
+    SbtDistributablesPlugin,
+    SbtAutoBuildPlugin
+  )
   .settings(
-    majorVersion        := 0,
-    scalaVersion        := "2.13.8",
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
-    // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
-    // suppress warnings in generated routes files
-    scalacOptions += "-Wconf:src=routes/.*:s",
+    scalacOptions += "-Wconf:src=routes/.*:s"
   )
-  .settings(
-    Compile / scalafmtOnCompile := true,
-    Test / scalafmtOnCompile := true,
-    IntegrationTest / scalafmtOnCompile := true,
-  )
-  .configs(IntegrationTest)
-  .settings(integrationTestSettings(): _*)
   .settings(resolvers += Resolver.jcenterRepo)
-  .settings(CodeCoverageSettings.settings: _*)
-  .settings(
-    PlayKeys.playDefaultPort := 6085
-  )
+  .settings(CodeCoverageSettings.settings *)
+  .settings(scalafmtOnCompile := true)
+
+lazy val it = project
+  .in(file("it"))
+  .enablePlugins(PlayScala)
+  .dependsOn(microservice % "test->test")
+  .settings(DefaultBuildSettings.itSettings())
