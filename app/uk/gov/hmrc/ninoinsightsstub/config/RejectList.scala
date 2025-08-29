@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.ninoinsightsstub.models
+package uk.gov.hmrc.ninoinsightsstub.config
 
-import play.api.libs.json.{Format, Json}
+import javax.inject.Inject
+import scala.io.Source
 
-case class NinoDetails(nino: String)
+class RejectList @Inject() {
 
-object NinoDetails {
-  implicit val ninoFormat: Format[NinoDetails] = Json.format[NinoDetails]
+  val ninos: List[String] = {
+    val bufferedSource = Source.fromURL(getClass.getResource("/data/nino_reject_list.csv"))
+    val lines = bufferedSource.getLines().drop(1)
+    lines.flatMap(line => line.split(",").map(_.trim).headOption).toList
+  }
 }

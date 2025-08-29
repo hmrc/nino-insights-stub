@@ -18,39 +18,20 @@ package uk.gov.hmrc.ninoinsightsstub.controllers
 
 import play.api.libs.json._
 import play.api.mvc.{Action, BaseController, ControllerComponents}
+import uk.gov.hmrc.ninoinsightsstub.config.RejectList
 import uk.gov.hmrc.ninoinsightsstub.models.NinoDetails
 
 import javax.inject.Inject
-import scala.concurrent.Future
 
-import scala.io.Source
+class NinoRiskListsController @Inject() (override val controllerComponents: ControllerComponents, rejectList: RejectList) extends BaseController {
 
-class NinoRiskListsController @Inject() (val controllerComponents: ControllerComponents) extends BaseController {
-
-  import NinoDetails.implicits._
-
-  lazy val ninoRejectList: List[String] = {
-    val bufferedSource = Source.fromURL(getClass.getResource("/data/nino_reject_list.csv"))
-    val lines = bufferedSource.getLines().drop(1)
-    lines.flatMap(line => line.split(",").map(_.trim).headOption).toList
-  }
-
-  def isNinoOnRejectList: Action[JsValue] = Action.async(parse.json) { req =>
-    val ninoOnRejectListRequest = Json.fromJson[NinoDetails](req.body)
-    ninoOnRejectListRequest.fold(
-      _ => {
-        Future.successful {
-          BadRequest("""{"message": "malformed request payload}""")
-        }
-      },
-      valid =>
-        Future.successful {
-          ninoRejectList.contains(valid.nino) match {
-            case true  => Ok("""{"result": true}""")
-            case false => Ok("""{"result": false}""")
-          }
-        }
-    )
+  def isNinoOnRejectList: Action[JsValue] = Action(parse.json) {
+    _.body.validate[NinoDetails] match {
+      case JsSuccess(model, _) =>
+        Ok(Json.obj("result" -> rejectList.ninos.contains(model.nino)))
+      case _ =>
+        BadRequest(Json.obj("message" -> "malformed request payload"))
+    }
   }
 
 }
