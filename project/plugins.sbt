@@ -8,8 +8,8 @@ resolvers += Resolver.url(
 )(Resolver.ivyStylePatterns)
 resolvers += Resolver.typesafeRepo("releases")
 
-addSbtPlugin("org.playframework" % "sbt-plugin" % "3.0.3")
-addSbtPlugin("uk.gov.hmrc" % "sbt-distributables" % "2.5.0")
-addSbtPlugin("uk.gov.hmrc" % "sbt-auto-build" % "3.21.0")
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.2")
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.0.12")
+addSbtPlugin("org.playframework" % "sbt-plugin"         % "3.0.8")
+addSbtPlugin("uk.gov.hmrc"       % "sbt-distributables" % "2.6.0")
+addSbtPlugin("uk.gov.hmrc"       % "sbt-auto-build"     % "3.24.0")
+addSbtPlugin("org.scalameta"     % "sbt-scalafmt"       % "2.5.5")
+addSbtPlugin("org.scoverage"     % "sbt-scoverage"      % "2.3.1")

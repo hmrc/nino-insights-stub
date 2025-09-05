@@ -16,53 +16,50 @@
 
 package uk.gov.hmrc.ninoinsightsstub.controllers
 
-import org.apache.pekko.actor.ActorSystem
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
+import uk.gov.hmrc.ninoinsightsstub.config.RejectList
 import uk.gov.hmrc.ninoinsightsstub.models.NinoDetails
 
 class NinoRiskListsControllerSpec extends AnyWordSpec with Matchers {
-  import NinoDetails.implicits._
 
-  implicit val system: ActorSystem = ActorSystem("test")
+  private val controller = new NinoRiskListsController(Helpers.stubControllerComponents(), new RejectList)
 
-  private val controller = new NinoRiskListsController(Helpers.stubControllerComponents())
+  def requestBuilder(nino: String): FakeRequest[JsValue] =
+    FakeRequest("POST", "/reject/nino")
+      .withBody(Json.toJson(NinoDetails(nino)))
+      .withHeaders(CONTENT_TYPE -> "application/json")
 
   "POST /reject/nino" should {
-    "return 200 with result false" in {
-      val rejectNinoDetailsPresentInList: NinoDetails = NinoDetails("ZL806201C")
-      val fakeRequestWithTrue = FakeRequest("POST", "/reject/nino")
-        .withBody(Json.toJson(rejectNinoDetailsPresentInList))
-        .withHeaders(CONTENT_TYPE -> "application/json")
-      val responseTrue = """{"result": true}"""
+    "return 200 with result true when NINO is on reject list" in {
 
-      val result = controller.isNinoOnRejectList()(fakeRequestWithTrue)
+      val result = controller.isNinoOnRejectList()(requestBuilder("ZL806201C"))
+
       status(result) shouldBe Status.OK
-      contentAsString(result) shouldBe responseTrue
+      contentAsJson(result) shouldBe Json.obj("result" -> true)
     }
 
-    "return 200 with result true" in {
-      val rejectNinoDetails: NinoDetails = NinoDetails("AB123456A")
-      val fakeRequestWithFalse = FakeRequest("POST", "/reject/nino")
-        .withBody(Json.toJson(rejectNinoDetails))
-        .withHeaders(CONTENT_TYPE -> "application/json")
-      val responseFalse = """{"result": false}"""
+    "return 200 with result false when NINO is NOT on reject list" in {
 
-      val result = controller.isNinoOnRejectList()(fakeRequestWithFalse)
+      val result = controller.isNinoOnRejectList()(requestBuilder("AB123456A"))
+
       status(result) shouldBe Status.OK
-      contentAsString(result) shouldBe responseFalse
+      contentAsJson(result) shouldBe Json.obj("result" -> false)
     }
-    "return 400 " in {
+
+    "return 400 when bad JSON is provided" in {
+
       val fakeRequestWithFalse = FakeRequest("POST", "/reject/nino")
         .withBody(Json.toJson(""))
         .withHeaders(CONTENT_TYPE -> "application/json")
+
       val result = controller.isNinoOnRejectList()(fakeRequestWithFalse)
+
       status(result) shouldBe Status.BAD_REQUEST
     }
-
   }
 }
