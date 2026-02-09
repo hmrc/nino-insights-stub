@@ -8,8 +8,6 @@ object CodeCoverageSettings {
     "Reverse.*",
     "uk.gov.hmrc.BuildInfo",
     "uk.gov.hmrc.ninoinsightsstub.config",
-    "app.*",
-    "prod.*",
     ".*Routes.*",
     "testOnly.*",
     "testOnlyDoNotUseInAppConf.*"
